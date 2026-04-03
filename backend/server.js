@@ -1,6 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const pool = require("./src/config/db");
+const authRoutes = require("./src/routes/authRoutes");
+const authMiddleware = require("./src/middleware/authMiddleware");
+const roleMiddleware = require("./src/middleware/roleMiddleware");
 
 const app = express();
 
@@ -31,3 +34,10 @@ app.get("/test-db", async (req, res) => {
     });
   }
 });
+
+app.use("/api/auth", authRoutes);
+
+app.get("/protected", authMiddleware, roleMiddleware("admin", "ceo"), (req, res) => {
+    res.send("You have access");
+  }
+);
