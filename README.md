@@ -1,4 +1,4 @@
-# Industrial Workflow Management System
+# FlowForge: An Industrial Workflow Management System
 
 ## Project Overview
 
