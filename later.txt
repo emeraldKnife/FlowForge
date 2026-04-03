@@ -1,0 +1,1 @@
+- add .env file and in `backend/src/config/db.js` file hide the password of database
