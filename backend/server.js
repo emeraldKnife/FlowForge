@@ -8,6 +8,7 @@ const orderRoutes = require("./src/routes/orderRoutes");
 const stageRoutes = require("./src/routes/stageRoutes");
 const delayService = require("./src/services/delayService");
 const notificationRoutes = require("./src/routes/notificationRoutes");
+const analyticsRoutes = require("./src/routes/analyticsRoutes");
 
 const app = express();
 
@@ -55,6 +56,8 @@ app.get("/check-delays", async (req, res) => {
 });
 
 app.use("/api/notifications", notificationRoutes);
+
+app.use("/api/analytics", analyticsRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => {

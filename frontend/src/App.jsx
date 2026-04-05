@@ -1,19 +1,7 @@
-import { useEffect, useState } from "react";
-import { getMessage } from "./services/api";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    getMessage().then(setMessage);
-  }, []);
-
-  return (
-    <div>
-      <h1>FlowForge</h1>
-      <p>{message}</p>
-    </div>
-  );
+  return <Dashboard />;
 }
 
 export default App;
