@@ -5,6 +5,7 @@ const authRoutes = require("./src/routes/authRoutes");
 const authMiddleware = require("./src/middleware/authMiddleware");
 const roleMiddleware = require("./src/middleware/roleMiddleware");
 const orderRoutes = require("./src/routes/orderRoutes");
+const stageRoutes = require("./src/routes/stageRoutes");
 
 const app = express();
 
@@ -44,3 +45,5 @@ app.get("/protected", authMiddleware, roleMiddleware("admin", "ceo"), (req, res)
 );
 
 app.use("/api/orders", orderRoutes);
+
+app.use("/api/stages", stageRoutes);
