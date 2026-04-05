@@ -7,6 +7,7 @@ const roleMiddleware = require("./src/middleware/roleMiddleware");
 const orderRoutes = require("./src/routes/orderRoutes");
 const stageRoutes = require("./src/routes/stageRoutes");
 const delayService = require("./src/services/delayService");
+const notificationRoutes = require("./src/routes/notificationRoutes");
 
 const app = express();
 
@@ -52,6 +53,8 @@ app.get("/check-delays", async (req, res) => {
     res.status(500).send("Error checking delays");
   }
 });
+
+app.use("/api/notifications", notificationRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => {

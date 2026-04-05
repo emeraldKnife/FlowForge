@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const notificationService = require("./notificationService");
 
 exports.checkDelays = async () => {
   const result = await pool.query(
@@ -31,6 +32,12 @@ exports.checkDelays = async () => {
           stage.order_id,
           `Department ${stage.department_id} delayed`
         ]
+      );
+
+      // Send notification
+      await notificationService.createNotificationForDepartment(
+        stage.department_id,
+        `Your department is delayed on order ${stage.order_id}`
       );
     }
   }

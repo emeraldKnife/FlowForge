@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const notificationService = require("./notificationService");
 
 exports.completeStage = async (orderId, departmentId) => {
   // Mark current stage completed
@@ -7,6 +8,12 @@ exports.completeStage = async (orderId, departmentId) => {
      SET status = 'completed', completed_at = NOW()
      WHERE order_id = $1 AND department_id = $2`,
     [orderId, departmentId]
+  );
+
+  // Send notification
+  await notificationService.createNotificationForDepartment(
+    departmentId,
+    `Department ${departmentId} completed its stage for order ${orderId}`
   );
 
   // Find next stage
@@ -33,6 +40,12 @@ exports.completeStage = async (orderId, departmentId) => {
       [orderId]
     );
   }
+
+  // Send notification for the next department
+  await notificationService.createNotificationForDepartment(
+    departmentId + 1,
+    `Your department can now start work on order ${orderId}`
+  );
   
   // Log
   await pool.query(
