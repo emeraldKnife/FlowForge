@@ -2,3 +2,4 @@
 - add tags to the repo
 - `backend/controllers/authController.js` file hide the JWT_SECRET in .env file
 - `backend/middleware/authMiddleware.js` file hide the JWT_SECRET in .env file
+- keep it clean
