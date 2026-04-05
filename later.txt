@@ -3,3 +3,4 @@
 - `backend/controllers/authController.js` file hide the JWT_SECRET in .env file
 - `backend/middleware/authMiddleware.js` file hide the JWT_SECRET in .env file
 - keep it clean
+- add a timer for rechecking the status of delay for the orders, so that it checks it regulary without manual checks

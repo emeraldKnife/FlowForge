@@ -6,6 +6,7 @@ const authMiddleware = require("./src/middleware/authMiddleware");
 const roleMiddleware = require("./src/middleware/roleMiddleware");
 const orderRoutes = require("./src/routes/orderRoutes");
 const stageRoutes = require("./src/routes/stageRoutes");
+const delayService = require("./src/services/delayService");
 
 const app = express();
 
@@ -14,11 +15,6 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("API is running...");
-});
-
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
 });
 
 app.get("/test-db", async (req, res) => {
@@ -47,3 +43,17 @@ app.get("/protected", authMiddleware, roleMiddleware("admin", "ceo"), (req, res)
 app.use("/api/orders", orderRoutes);
 
 app.use("/api/stages", stageRoutes);
+
+app.get("/check-delays", async (req, res) => {
+  try {
+    await delayService.checkDelays();
+    res.send("Delay check completed");
+  } catch (err) {
+    res.status(500).send("Error checking delays");
+  }
+});
+
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
