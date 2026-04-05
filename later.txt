@@ -6,3 +6,4 @@
 - add a timer for rechecking the status of delay for the orders, so that it checks it regulary without manual checks
 - add proper frontend
 - check all error handling
+- improve the README.md file (see week 9)
