@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 function Dashboard() {
   const [data, setData] = useState(null);
+  const { logout } = useAuth();
 
   useEffect(() => {
     fetch("http://localhost:5000/api/analytics/dashboard")
@@ -31,6 +33,10 @@ function Dashboard() {
       {data.workflowStats.map((item, i) => (
         <p key={i}>{item.status}: {item.count}</p>
       ))}
+
+      <button onClick={logout}>
+        Logout
+      </button>
     </div>
   );
 }

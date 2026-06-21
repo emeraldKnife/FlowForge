@@ -15,9 +15,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
+
 
 app.get("/test-db", async (req, res) => {
   try {
@@ -35,16 +37,21 @@ app.get("/test-db", async (req, res) => {
   }
 });
 
+
 app.use("/api/auth", authRoutes);
+
 
 app.get("/protected", authMiddleware, roleMiddleware("admin", "ceo"), (req, res) => {
     res.send("You have access");
   }
 );
 
+
 app.use("/api/orders", orderRoutes);
 
+
 app.use("/api/stages", stageRoutes);
+
 
 app.get("/check-delays", async (req, res) => {
   try {
@@ -55,9 +62,12 @@ app.get("/check-delays", async (req, res) => {
   }
 });
 
+
 app.use("/api/notifications", notificationRoutes);
 
+
 app.use("/api/analytics", analyticsRoutes);
+
 
 const PORT = 5000;
 app.listen(PORT, () => {

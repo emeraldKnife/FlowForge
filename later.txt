@@ -7,3 +7,5 @@
 - add proper frontend
 - check all error handling
 - improve the README.md file (see week 9)
+- add screenshots
+- summer modification
