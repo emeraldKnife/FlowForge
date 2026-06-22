@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
+import { jwtDecode } from "jwt-decode";
 
 function Login() {
   const navigate = useNavigate();
@@ -14,18 +15,33 @@ function Login() {
 
   const [error, setError] = useState("");
 
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     try {
       const data = await loginUser(
         email,
         password
       );
-
+      
       login(data.token);
+      
+      const decoded = jwtDecode(data.token);
 
-      navigate("/dashboard");
+      if (decoded.role === "admin") {
+        navigate("/admin");
+      }
+      else if (decoded.role === "ceo") {
+        navigate("/ceo");
+      }
+      else if (decoded.role.includes("head")) {
+        navigate("/head");
+      }
+      else {
+        navigate("/worker");
+      }
+
     } catch (err) {
       setError("Invalid Credentials");
     }
