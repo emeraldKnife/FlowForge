@@ -1,21 +1,27 @@
-import { createContext, useContext, useState } from "react";
+import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import { AuthContext } from "./authStore";
 
-const AuthContext = createContext();
+const readToken = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  try {
+    const decoded = jwtDecode(token);
+    if (decoded.exp * 1000 <= Date.now()) throw new Error("expired");
+    return decoded;
+  } catch {
+    localStorage.removeItem("token");
+    return null;
+  }
+};
 
 export const AuthProvider = ({ children }) => {
-  const token = localStorage.getItem("token");
-
-  const [user, setUser] = useState(
-    token ? jwtDecode(token) : null
-  );
+  const [user, setUser] = useState(readToken);
 
   const login = (token) => {
     localStorage.setItem("token", token);
 
-    const decoded = jwtDecode(token);
-
-    setUser(decoded);
+    setUser(readToken());
   };
 
   const logout = () => {
@@ -34,8 +40,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  return useContext(AuthContext);
 };

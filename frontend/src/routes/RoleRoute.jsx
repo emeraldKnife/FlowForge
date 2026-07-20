@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 function RoleRoute({
   children,
@@ -11,11 +11,7 @@ function RoleRoute({
     return <Navigate to="/login" />;
   }
 
-  if (
-    !allowedRoles.includes(
-      user.role.toLowerCase()
-    )
-  ) {
+  if (!allowedRoles.includes(user.role?.toLowerCase())) {
     return <Navigate to="/login" />;
   }
 

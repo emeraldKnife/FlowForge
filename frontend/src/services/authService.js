@@ -1,7 +1,7 @@
-const API_URL = "http://localhost:5000/api/auth";
+import { api } from "./api";
 
 export const loginUser = async (email, password) => {
-  const response = await fetch(`${API_URL}/login`, {
+  return api("/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -12,11 +12,6 @@ export const loginUser = async (email, password) => {
     }),
   });
 
-  if (!response.ok) {
-    throw new Error("Invalid Credentials");
-  }
-
-  return response.json();
 };
 
 export const logoutUser = () => {

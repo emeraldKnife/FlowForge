@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/authService";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { jwtDecode } from "jwt-decode";
 
 function Login() {
@@ -28,31 +28,35 @@ function Login() {
       login(data.token);
       
       const decoded = jwtDecode(data.token);
+      const role = decoded.role?.toLowerCase();
 
-      if (decoded.role === "admin") {
+      if (role === "admin") {
         navigate("/admin");
       }
-      else if (decoded.role === "ceo") {
+      else if (role === "ceo") {
         navigate("/ceo");
       }
-      else if (decoded.role.includes("head")) {
+      else if (role?.includes("head")) {
         navigate("/head");
       }
       else {
         navigate("/worker");
       }
 
-    } catch (err) {
-      setError("Invalid Credentials");
+    } catch (error) {
+      setError(error.message || "Invalid credentials");
     }
   };
 
   return (
-    <div>
-      <h1>FlowForge Login</h1>
+    <main className="auth-page">
+      <section className="auth-card">
+      <p className="eyebrow">Industrial workflow management</p>
+      <h1>FlowForge</h1>
+      <p>Sign in to view the work that needs your team.</p>
 
       <form onSubmit={handleSubmit}>
-        <input
+        <input required
           type="email"
           placeholder="Email"
           value={email}
@@ -61,7 +65,7 @@ function Login() {
           }
         />
 
-        <input
+        <input required
           type="password"
           placeholder="Password"
           value={password}
@@ -75,8 +79,9 @@ function Login() {
         </button>
       </form>
 
-      {error && <p>{error}</p>}
-    </div>
+      {error && <p className="error">{error}</p>}
+      </section>
+    </main>
   );
 }
 

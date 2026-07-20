@@ -1,14 +1,3 @@
-function CEODashboard() {
-  return (
-    <div>
-      <h1>CEO Dashboard</h1>
+import Dashboard from "./Dashboard";
 
-      <p>
-        Company analytics and reports
-        will appear here.
-      </p>
-    </div>
-  );
-}
-
-export default CEODashboard;
+export default Dashboard;

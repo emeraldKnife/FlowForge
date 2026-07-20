@@ -1,153 +1,96 @@
-# FlowForge: An Industrial Workflow Management System
+# FlowForge
 
-## Project Overview
+FlowForge is a role-based industrial workflow management application for the fixed pipeline **Design → Production → Quality Checking → Dispatch**. It helps an industrial team track an order from creation through dispatch, surface late stages, and give every role the information and controls appropriate to it.
 
-This project is a web-based workflow management system designed for
-medium to large-scale industries. It streamlines the execution of
-industrial processes by structuring operations into fixed stages:
-**Design → Production → Quality Checking → Dispatch**.
+## What it does
 
-The system enables seamless coordination between departments, real-time
-tracking of work progress, and identification of delays or bottlenecks.
-It focuses on operational efficiency rather than traditional ERP
-features like finance or inventory.
+- Runs each order through the four fixed departments in sequence.
+- Requires every active worker in a department to mark their own work complete before the order moves to the next department.
+- Detects overdue active stages automatically on a configurable schedule and records delay notifications and audit logs.
+- Separates access for admins, CEOs, department heads, and workers.
+- Lets workers mark daily attendance and send suggestions or grievances to their department head.
+- Lets heads review departmental feedback and send staffing requests to admins.
+- Lets admins create users and orders, and approve or reject staffing requests.
+- Shows CEOs company-wide analytics and heads analytics restricted to their department.
 
-------------------------------------------------------------------------
+## Roles
 
-## Core Features
+| Role | Access |
+| --- | --- |
+| `worker` | Current departmental work, personal completion status, attendance, feedback, notifications |
+| `*_head` | Department analytics, feedback, active workers, staffing requests |
+| `admin` | Create users and orders, review staffing requests, run an on-demand delay check |
+| `ceo` | Company-wide workflow, completion, and delay analytics |
 
-### 1. Role-Based Access Control (RBAC)
+The supported head roles are `design_head`, `production_head`, `quality_head`, and `dispatch_head`.
 
--   **Workers**: Update task progress, mark completion, raise
-    grievances/suggestions
--   **Department Heads**: Monitor progress, manage workflows, view
-    delays
--   **Admin**: Manage users and system configurations
--   **CEO**: View system-wide analytics and reports
+## Tech stack
 
-------------------------------------------------------------------------
+- Frontend: React, Vite, React Router
+- Backend: Node.js, Express, JWT, bcrypt
+- Database: PostgreSQL
 
-### 2. Department-Based Work Execution
+## Prerequisites
 
--   Work is assigned to **entire departments**, not individuals
--   Each department collaboratively handles its stage:
-    -   Design Team
-    -   Production Team
-    -   Quality Checking Team
-    -   Dispatch Team
+- Node.js 20+
+- PostgreSQL 14+
 
-------------------------------------------------------------------------
+## Local setup
 
-### 3. Fixed Workflow Pipeline
+1. Create a PostgreSQL database named `flowforge`.
+2. Copy [`backend/.env.example`](backend/.env.example) to `backend/.env` and set a real database URL and a long random JWT secret. Do not commit this file.
+3. Install dependencies in both applications:
 
--   Predefined workflow:
+   ```sh
+   cd backend && npm install
+   cd ../frontend && npm install
+   ```
 
-        Design → Production → Quality Checking → Dispatch
+4. Create all tables and the four fixed departments:
 
--   Automatic stage transitions when previous stage is completed
+   ```sh
+   cd backend
+   npm run db:schema
+   ```
 
--   No manual dependency handling required
+5. Create the first administrator. The command accepts a name, email, and password (at least eight characters):
 
-------------------------------------------------------------------------
+   ```sh
+   npm run create-admin -- "Admin Name" admin@example.com a-strong-password
+   ```
 
-### 4. Workflow State Management
+6. Start the backend and frontend in separate terminals:
 
-Each order/task goes through: - Pending - In Progress - Completed -
-Delayed
+   ```sh
+   cd backend && npm run dev
+   cd frontend && npm run dev
+   ```
 
-------------------------------------------------------------------------
+Open the frontend URL printed by Vite (normally `http://localhost:5173`) and sign in with the administrator account. Use the admin dashboard to add department heads and workers before starting orders.
 
-### 5. Delay & Bottleneck Detection
+## Workflow behaviour
 
--   Tracks expected vs actual completion time
--   Automatically flags delays
--   Identifies which department caused the delay
--   Displays insights like:
-    -   "Production delayed by 2 days"
+When an admin creates an order, its Design stage starts immediately. A stage has an expected duration in hours. FlowForge checks active stages every five minutes by default (`DELAY_CHECK_INTERVAL_MS`) and marks an overdue stage as delayed once. Completing a delayed stage is still possible. When all active workers in that stage have completed their own progress item, FlowForge completes the stage, creates an audit entry, activates the next department, and notifies it. The final Dispatch completion marks the order completed.
 
-------------------------------------------------------------------------
+## API overview
 
-### 6. In-App Notification System
+All API routes except `POST /api/auth/login` require a JWT in the form `Authorization: Bearer <token>`.
 
--   Notifications visible within user profiles
--   Triggered on:
-    -   Stage completion
-    -   Next stage activation
-    -   Delay detection
+- `POST /api/auth/login`, `GET /api/auth/me`
+- `GET|POST /api/users`, `GET /api/users/departments`, `PATCH /api/users/:id/active`
+- `GET|POST /api/orders`
+- `GET /api/stages/my-work`, `POST /api/stages/my-progress`
+- `POST /api/worker/attendance`, `POST /api/worker/feedback`
+- `GET|POST /api/head/requests`, `GET /api/head/feedback`, `GET /api/head/workers`
+- `GET|PATCH /api/requests` for admins
+- `GET /api/analytics/dashboard`
+- `GET /api/notifications/:userId`
 
-------------------------------------------------------------------------
+## Verification
 
-### 7. Audit Logging System
+```sh
+cd backend && npm test
+cd frontend && npm run lint && npm run build
+```
 
--   Logs all critical system events:
-    -   Stage transitions
-    -   Completion timestamps
-    -   Delay occurrences
--   Ensures traceability and accountability
-
-------------------------------------------------------------------------
-
-### 8. Global Dashboard (Visible to All)
-
-Displays: - Task completion rates - Department-wise delays - Active vs
-completed tasks - Workflow progress of orders - Bottleneck insights
-
-------------------------------------------------------------------------
-
-### 9. Worker Utilities
-
--   Attendance marking
--   Grievance submission
--   Suggestions system
-
-------------------------------------------------------------------------
-
-## System Architecture
-
--   Frontend communicates with backend via REST APIs
--   Backend manages workflow logic and state transitions
--   Database stores users, tasks, logs, and workflow states
--   Optional background jobs for handling workflow triggers
-
-------------------------------------------------------------------------
-
-## Suggested Tech Stack
-
-### Frontend
-
--   React.js or Next.js
--   Tailwind CSS (UI styling)
-
-### Backend
-
--   Node.js with Express.js
-
-### Database
-
--   PostgreSQL
-
-### Authentication
-
--   JWT (JSON Web Tokens)
-
-### Optional Enhancements
-
--   Redis (for caching and background processing)
-
-------------------------------------------------------------------------
-
-## Why This Project Stands Out
-
--   Demonstrates strong backend and system design skills
--   Implements real-world workflow automation
--   Includes analytics and monitoring features
--   Focuses on problem-solving rather than superficial UI
-
-------------------------------------------------------------------------
-
-## Future Enhancements
-
--   Predictive delay analysis
--   Mobile application
--   Integration with IoT devices in factories
--   Advanced analytics using machine learning
+The repository intentionally does not contain production credentials. If credentials were ever committed, rotate them in PostgreSQL and replace the affected `.env` value before deployment.

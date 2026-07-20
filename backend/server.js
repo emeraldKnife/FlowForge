@@ -9,15 +9,20 @@ const stageRoutes = require("./src/routes/stageRoutes");
 const delayService = require("./src/services/delayService");
 const notificationRoutes = require("./src/routes/notificationRoutes");
 const analyticsRoutes = require("./src/routes/analyticsRoutes");
+const userRoutes = require("./src/routes/userRoutes");
+const workerRoutes = require("./src/routes/workerRoutes");
+const headRoutes = require("./src/routes/headRoutes");
+const requestRoutes = require("./src/routes/requestRoutes");
+require("dotenv").config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:5173" }));
 app.use(express.json());
 
 
-app.get("/", (req, res) => {
-  res.send("API is running...");
+app.get("/", (_req, res) => {
+  res.json({ name: "FlowForge API", status: "ok" });
 });
 
 
@@ -41,19 +46,13 @@ app.get("/test-db", async (req, res) => {
 app.use("/api/auth", authRoutes);
 
 
-app.get("/protected", authMiddleware, roleMiddleware("admin", "ceo"), (req, res) => {
-    res.send("You have access");
-  }
-);
-
-
 app.use("/api/orders", orderRoutes);
 
 
 app.use("/api/stages", stageRoutes);
 
 
-app.get("/check-delays", async (req, res) => {
+app.post("/api/check-delays", authMiddleware, roleMiddleware("admin"), async (_req, res) => {
   try {
     await delayService.checkDelays();
     res.send("Delay check completed");
@@ -67,9 +66,32 @@ app.use("/api/notifications", notificationRoutes);
 
 
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/worker", workerRoutes);
+app.use("/api/head", headRoutes);
+app.use("/api/requests", requestRoutes);
 
+let delayCheckRunning = false;
+const checkDelays = async () => {
+  if (delayCheckRunning) return;
+  delayCheckRunning = true;
+  try {
+    await delayService.checkDelays();
+  } catch (error) {
+    console.error("Scheduled delay check failed:", error.message);
+  } finally {
+    delayCheckRunning = false;
+  }
+};
+setInterval(checkDelays, Number(process.env.DELAY_CHECK_INTERVAL_MS) || 300000).unref();
 
-const PORT = 5000;
+app.use((error, _req, res, _next) => {
+  console.error(error);
+  res.status(500).json({ message: "Unexpected server error" });
+});
+
+const PORT = Number(process.env.PORT) || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  checkDelays();
 });

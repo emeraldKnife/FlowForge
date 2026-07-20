@@ -1,17 +1,16 @@
-const jwt = require("jsonwebtoken");
-
-const JWT_SECRET = "flowforge_super_secret_key_2026_secure_random";
+const { verifyToken } = require("../config/auth");
 
 module.exports = (req, res, next) => {
-  const token = req.headers["authorization"];
+  const header = req.headers.authorization;
+  const token = header?.startsWith("Bearer ") ? header.slice(7) : null;
 
-  if (!token) return res.status(401).send("Access denied");
+  if (!token) return res.status(401).json({ message: "Authentication is required" });
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = verifyToken(token);
     req.user = decoded;
     next();
   } catch (err) {
-    res.status(400).send("Invalid token");
+    res.status(401).json({ message: "Invalid or expired token" });
   }
 };
