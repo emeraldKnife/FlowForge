@@ -26,23 +26,6 @@ app.get("/", (_req, res) => {
 });
 
 
-app.get("/test-db", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT NOW()");
-    res.json({
-      success: true,
-      time: result.rows[0],
-    });
-  } catch (error) {
-    console.error("DB Error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Database connection failed",
-    });
-  }
-});
-
-
 app.use("/api/auth", authRoutes);
 
 
