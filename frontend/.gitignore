@@ -28,3 +28,8 @@ dist-ssr
 *.sw?
 later.txt
 acc_details.txt
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
